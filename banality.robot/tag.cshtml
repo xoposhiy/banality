@@ -1,0 +1,121 @@
+﻿@using banality.robot
+@model GameResult
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Банальности — @Model.Tag.Title</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css\bootstrap.css" />
+	<link rel="stylesheet" href="css\bootstrap-responsive.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+	<script src="js\bootstrap.js"></script>
+	<style type="text/css">
+		body {
+			padding-top: 60px;
+		}
+		.hero-unit h1
+		{
+			font-size: 40pt;
+			padding-bottom: 20px;
+		}
+		.hero-unit h2
+		{
+			font-size: 20pt;
+			padding-top: 40px;
+		}
+		.hero-unit p
+		{
+			font-size: 12pt;
+			margin-left: 40px;
+		}
+		.words-count {
+			vertical-align: super;
+			font-size: smaller;
+			color: grey;
+		}
+	</style>
+</head>
+	<body>
+		<div class="container">
+			<h1><a href="index.html">Банальности</a> / @Model.Tag.Title</h1>
+			<div class="row">
+				<dl class="span6 well dl-horizontal">
+					<dt>Когда</dt>
+					<dd>@Model.Tag.Start.PrettyFormat() — @Model.Tag.Finish.PrettyFormat()</dd>
+					<dt>Участников</dt>
+					<dd>@Model.Results.Length</dd>
+					<dt>Банальностей</dt>
+					<dd>@Model.WordsScores.Length</dd>
+				</dl>
+			</div>
+			<div class="row">
+				<div class="span7">
+					<h2>Результаты</h2>
+					<table class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th>Место</th>
+								<th>Кто</th>
+								<th>Баллы</th>
+							</tr>
+						</thead>
+						<tbody>
+							@{ int lineNumber = 1;}
+							@foreach (var res in Model.Results)
+							{
+								<tr>
+									<td rowspan="2">@(lineNumber++)</td>
+									<td>
+										@res.Player.Name
+										@res.Player.Position @res.Player.Company
+									</td>
+									<td>
+										@res.WordsScores.Sum(ws => ws.Item2)
+									</td>
+								</tr>
+								<tr>
+									<td colspan="3">
+										@foreach (var ws in res.WordsScores.OrderByDescending(ws => ws.Item2))
+										{
+											<span>@ws.Item1.Shorten()</span><span class="words-count">@ws.Item2</span> 
+										}
+									</td>
+								</tr>
+							}
+						</tbody>
+
+					</table>
+				</div>
+				<table class="span5 table table-bordered">
+					<thead>
+						<tr>
+							<th>
+								Банальность
+							</th>
+							<th>
+								Количество
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var ws in Model.WordsScores)
+						{
+							<tr>
+								<td>
+									@ws.Item1.Shorten()
+								</td>
+								<td>
+									@ws.Item2
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<script>
+			$('a').tooltip({placement: "bottom"});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,175 @@
+﻿@using banality.robot
+@model banality.robot.GameModel
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="Cache-Control" content="no-store" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Банальности</title>
+		<link rel="stylesheet" href="css\bootstrap.css" />
+		<link rel="stylesheet" href="css\bootstrap-responsive.css" />
+		<script src="js\bootstrap.js"> </script>
+		<style type="text/css">
+			.hero-unit {
+				 padding: 40px;
+				 padding-top: 20px;
+				 padding-bottom: 10px;
+			}
+
+			.hero-unit h1 {
+				font-size: 30pt;
+				padding-bottom: 20px;
+			}
+
+			h2 {
+				 font-size: 20pt;
+ 				padding-bottom: 20px;
+
+			}
+
+			.hero-unit p {
+				font-size: 10pt;
+				margin-left: 40px;
+			}
+
+			.words-count {
+				color: grey;
+				font-size: smaller;
+				vertical-align: super;
+			}
+
+			.right-part {
+				 float: right;
+				padding: 20px;
+			}
+			.current-title {
+				font-size: 16pt;
+				font-weight: bold;
+			}
+			.waiting-you {
+				margin-top: 10px;
+				font-size: 16pt;
+				font-weight: bold;
+			}
+			.waiting-you a {
+				text-decoration: underline;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="hero-unit">
+				<div class="right-part visible-desktop">
+					<h2>
+						<a href="http://bit.ly/bangame">http://bit.ly/bangame</a></h2>
+					<img src="img/sample.png" alt="скриншот письма" />
+				</div>
+				<h1>Играем в банальности!</h1>
+					<p><img class="hidden-desktop" src="img/sample.png" alt="скриншот письма" /></p>
+				<p>
+					1. Придумайте 5 самых банальных ассоциаций на
+					@if (Model.Current != null)
+					{
+						<text>тему </text>
+						<strong>@Model.Current.Title</strong>
+					}
+					else
+					{
+						<text>указанную тему</text>
+					}
+				</p>
+				<p>
+					2. Отправьте письмо на <a href="mailto:banality@bk.ru?subject=@Model.CurrentTag">banality@bk.ru</a>
+					с такой темой:
+					@(Model.Current != null ? Model.Current.Tag : "тег темы"), а потом 5 ваших банальностей
+					через пробел, как на картинке.</p>
+				<p>
+					3. Возвращайтесь после окончания тура и смотрите результаты! За каждое слово вы
+					получаете столько очков, сколько участников это слово назвали (включая вас самих). 
+					Слова сравниваются побуквенно, так, например, "банальность" и "банальности" — это разные слова. 
+					Засчитываются первые 5 указанных слов из последнего полученного от вас письма.</p>
+			</div>
+			@if(Model.Current != null)
+			{
+				<div class="row">
+					<div class="span10">
+						<h2>Текущий тур!</h2>
+						<p>
+							Шлите 5 банальных ассоциаций на тему 
+							<strong class="current-title">"@Model.Current.Title"</strong> на адрес <a href="mailto:banality@bk.ru?subject=@Model.CurrentTag">banality@bk.ru</a> с тегом <code>@Model.Current.Tag</code>.
+						</p><p>
+								Успевайте до @Model.Current.Finish.PrettyFormat(). После этого времени ответы не принимаются, зато становятся доступны результаты!
+							</p>
+					</div>
+				</div>
+			}
+			else if(Model.Next != null)
+			{
+				<div class="row">
+					<div class="span10">
+						<h2>Следующий тур!</h2>
+						<p>
+							Следующий тур начнется в @Model.Next.Start.PrettyFormat(). Тема станет известно сразу после начала.
+						</p>
+
+					</div>
+				</div>
+			}
+
+			<div class="row">
+				<span class="span1">&nbsp;</span>
+			</div>
+			<h2>Прошедшие туры</h2>
+				
+				
+
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>
+							Тема
+						</th>
+						<th>
+							Победитель
+						</th>
+						<th>
+							Банальности
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (GameResult game in Model.FinishedGames)
+					{
+						<tr>
+							<td>
+								<a href='@(game.Tag.Tag + ".html")'>@game.Tag.Title</a>
+							</td>
+							<td>
+								@if (game.Winner != null)
+								{
+									<span>@game.Winner.Player.Name</span>
+									<span class="words-count">@game.Winner.Score</span>	
+								}
+							</td>
+							<td>
+								@foreach (var ws in game.WordsScores.OrderByDescending(ws => ws.Item2).Where(ws => ws.Item2 > 1).Take(10))
+								{
+									<span>@ws.Item1.Shorten()</span>
+									<span class="words-count">@ws.Item2</span>
+								}
+
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		      <hr>
+
+			  <footer style="text-align: center;">
+	  			<img src="http://www.skbkontur.ru/theme/ver-355797234/images/logo.gif">
+				<div class="waiting-you"><a href="http://www.skbkontur.ru/career/vacancies?from=banality">Мы тебя ждем!</a></div>
+			  </footer>
+		</div>
+	</body>
+</html>
